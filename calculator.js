@@ -14,7 +14,6 @@ const divide = function(num1, num2) {
     return (num1 / num2)
 };
 
-console.log(divide(100, 2));
 
 let num1;
 let num2;
@@ -51,13 +50,15 @@ document.addEventListener('DOMContentLoaded', function() {
         {text: '2', class: 'number'},
         {text: '3', class: 'number'},
         {text: '+', class: 'operator'},
-        {text: '0', class: 'wide number'},
+        {text: '0', class: 'wide-number'},
         {text: '.', class: 'number'},
         {text: '=', class: 'operator'}
     ];
     
 
+    
     buttons.forEach(buttonInfo => {
+        
         const button = document.createElement('button');
         button.innerText = buttonInfo.text;
         button.classList.add(buttonInfo.class);

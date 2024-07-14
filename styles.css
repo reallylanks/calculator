@@ -33,7 +33,7 @@ main {
     display: flex;
     justify-content: right;
     align-items: center;
-    height: 100px;
+    height: 120px;
     width: 98%;
     margin-top: 5px;
     margin-bottom: 8px;
@@ -44,14 +44,33 @@ main {
 #buttonContainer {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 5px;
+    grid-template-rows: auto;
+    gap: 1px;
+    width: 98%;
+    height: 100%;
 }
 
 button {
-height: 50px;
-width: 100px;
+    font-family: monospace;
+    font-size: 30px;
+    height: 100%;
+    width: 100%;
+    border-radius: 5%;
+}
+
+button.wide-number {
+    grid-column: span 2;
+}
+
+button.number,
+button.wide-number {
+    background-color: #6AA956;
 }
 
 button.special {
-    background-color: red
+    background-color: #A9566A;
+}
+
+button.operator {
+    background-color: #566AA9;
 }
