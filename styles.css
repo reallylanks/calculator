@@ -1,11 +1,13 @@
 html {
     background-color: rgb(246, 246, 239);
+    font-family: monospace;
 }
 
 main {
     display: flex;
     justify-content: center;
     align-items: center;
+    height: 100vh;
 }
 
 #container {
@@ -20,18 +22,36 @@ main {
 
 #inner-interface {
     display: flex;
-    justify-content: center;
-    
-    
+    flex-direction: column;
+    align-items: center;
     height: 96%;
     width: 96%;
     background-color: black;
 }
 
 #display {
-    height: 20%;
+    display: flex;
+    justify-content: right;
+    align-items: center;
+    height: 100px;
     width: 98%;
     margin-top: 5px;
+    margin-bottom: 8px;
     background-color: rgb(200, 198, 198);
+    font-size: 70px;
 }
 
+#buttonContainer {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+}
+
+button {
+height: 50px;
+width: 100px;
+}
+
+button.special {
+    background-color: red
+}
