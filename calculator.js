@@ -16,7 +16,13 @@ const divide = function(num1, num2) {
 
 const updateDisplay = function() {
     document.getElementById('display').innerText = `${displayValue1}`;
-}
+};
+
+const clearMemory = function() {
+    num1 = undefined;
+    num2 = undefined;
+    operator = undefined;
+};
 
 let displayValue1 = '0';
 let num1;
@@ -70,42 +76,110 @@ document.addEventListener('DOMContentLoaded', function() {
         button.innerText = buttonInfo.text;
         button.classList.add(buttonInfo.class);
         button.addEventListener('click', () => {
-            
+    
+            // NOTE. anything (operator) number then decimal, erases number
+        
             if (buttonInfo.class === 'number' || buttonInfo.class === 'wide-number') {
-                // if '.' is pressed and character 1 is 0, add '.'
-                if (displayValue1.charAt(0) === '0' && buttonInfo.text === '.') {
-                    displayValue1 += buttonInfo.text;
-                    updateDisplay();
+                
+                if (buttonInfo.text === '.' && displayValue1.includes('.') && (num1 === undefined || num1 === 'ready4Next' )) {
+                
+                    console.log('DO NOTHING')
+                    return;
+                } 
+
+                if (num2 === 'ready4Next' && operator === 'ready4Next') {
+                    if (displayValue1 === '0.') {
+                        displayValue1 += buttonInfo.text;
+                        updateDisplay();
+                        console.log("Option 1 was run");
+                    }
+                   
+                    else if (buttonInfo.text === '.'){
+                        displayValue1 = '0.';
+                        clearMemory();
+                        updateDisplay();
+                        console.log("Option 2 was run");
+                    }
+
+                    else {
+                        displayValue1 = buttonInfo.text
+                        clearMemory();
+                        updateDisplay();
+                        console.log("Option 3 was run");
+                    }
+                    
                 }
-               // if first char is 0, the pressed number replaces it 
-                else if (displayValue1.charAt(0) === '0') {
-                    displayValue1 = buttonInfo.text;
-                    updateDisplay();
+
+                else if (buttonInfo.text === '.' && operator !== undefined) {
+
+                    console.log(`Display Value : ${displayValue1}`)
+
+                     displayValue1 = '0.';
+                     console.log('did it work..?')
+                     updateDisplay();       
+
+                    /*if (displayValue1 === num1) {
+                        displayValue1 = '0.';
+                        updateDisplay();
+                    }
+
+                    else {
+                        displayValue1 += buttonInfo.text;
+                        console.log('problem!')
+                        updateDisplay();
+                    } */
+
+                    
+                    
+                    // this is the root of my decimal problem...to tired to even put it into words...
+                    
                 }
-                // if num1 is equal to display and operator is NOT undefined, display now equals button text value    
+
+                // if num1 is equal to display and operator is NOT undefined, display now equals button text value 
                 else if (num1 == displayValue1 && operator !== undefined) {
                     displayValue1 = buttonInfo.text;
                     updateDisplay();
                 } 
 
+                // if '.' is pressed and character 1 is 0, add '.'
+                else if ((displayValue1.charAt(0) === '0' && buttonInfo.text === '.') || (displayValue1.charAt(0) === '0' && displayValue1.charAt(1) === '.')) {
+                    displayValue1 += buttonInfo.text;
+                    updateDisplay();
+                }
+               // if first char is 0, the pressed number replaces it 
+                else if (displayValue1.charAt(0) === '0' && displayValue1.charAt(1) !== '.' ) {
+                    displayValue1 = buttonInfo.text;
+                    updateDisplay();
+                }
+
                 // if calc is fresh or if num2 is 'ready4next', add pressed number to display
-                else if ((num1 === undefined && num2 === undefined && operator === undefined) || (num1 !== undefined && num2 === 'ready4Next' )) {
+                else if ((num1 === undefined && num2 === undefined && operator === undefined) || (num1 !== undefined && (num2 === 'ready4Next' || num2 === undefined))) {
                     displayValue1 += buttonInfo.text;
                     updateDisplay();
                 } 
                 // START OF A NEW EQUATION: if num2 and operator are 'ready4Next', button pressed resets calc and becomes display value
-                if (num2 === 'ready4Next' && operator === 'ready4Next') {
-                    displayValue1 = buttonInfo.text
-                    num1 = undefined;
-                    num2 = undefined;
-                    operator = undefined;
-                    updateDisplay();
-                }
+                /* if (num2 === 'ready4Next' && operator === 'ready4Next') {
+                    if (displayValue1 === '0.') {
+                        displayValue1 += buttonInfo.text;
+                        updateDisplay();
+                    }
+                   
+                    if (buttonInfo.text === '.'){
+                        displayValue1 = '0.';
+                        updateDisplay();
+                    }
 
-               /*  else {
-                    displayValue1 += buttonInfo.text;
-                    updateDisplay();
-                }  */
+                    else {
+                        displayValue1 = buttonInfo.text
+                        num1 = undefined;
+                        num2 = undefined;
+                        operator = undefined;
+                        updateDisplay();
+                    }
+                    
+                } */
+
+               
             }
             
             if (buttonInfo.class === 'operator') {
@@ -113,12 +187,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (num1 === undefined) {
                     num1 = Number(displayValue1);
                 }
+                
+                if (buttonInfo.text === '=' && (operator === 'ready4Next' || operator === undefined)) {
+                    return; 
+                }
 
-                if (operator === undefined || operator === 'ready4Next') {
+                else if (operator === undefined || operator === 'ready4Next') {
                     operator = buttonInfo.text;
                 }
 
                 else if (buttonInfo.text !== '=' && operator !== undefined) {
+                    num1 = Number(num1);
                     num2 = Number(displayValue1);
                     displayValue1 = operate(num1, num2, operator);
                     num1 = Number(displayValue1);
@@ -126,9 +205,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     operator = buttonInfo.text;
                     updateDisplay(); 
                 }
-                
 
                 else if (buttonInfo.text === '=' && num1 !== undefined) {
+                    num1 = Number(num1);
                     num2 = Number(displayValue1);
                     displayValue1 = operate(num1, num2, operator);
                     num1 = Number(displayValue1);
@@ -136,30 +215,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     operator = 'ready4Next';
                     updateDisplay(); 
                 }
-                
-                
-                
-
-                // this block
-                /* if (num1 !== undefined && operator !== undefined && operator !== 'ready4Next') {
-                    num2 = Number(displayValue1);
-                    operator = buttonInfo.text;
-                    displayValue1 = operate(num1, num2, operator);
-                    num1 = Number(displayValue1);
-                    num2 = 'ready4Next';
-                    operator = 'ready4Next';
-                    updateDisplay();
-                }  */
-                
-        
             }
 
             if (buttonInfo.class === 'special') {
+
                 if (buttonInfo.text === 'AC') {
                     displayValue1 = '0';
-                    num1 = undefined;
-                    num2 = undefined;
-                    operator = undefined;
+                    clearMemory();
                     updateDisplay();
                 }
 
@@ -167,6 +229,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     result = Number(displayValue1) * 0.01;
                     displayValue1 = result.toString();
                     updateDisplay();
+
+                    if (num2 === 'ready4Next' && operator === 'ready4Next') {
+                        num1 = displayValue1;
+                    }
                 }
 
                 if (buttonInfo.text === '+/-') {
@@ -179,45 +245,28 @@ document.addEventListener('DOMContentLoaded', function() {
                         displayValue1 = '-' + displayValue1;
                         updateDisplay();
                     }
+
+                    if (num2 === 'ready4Next' && operator === 'ready4Next') {
+                        num1 = displayValue1;
+                    }
                 }
             }
 
 
             /*so
             NOTES FOR NEXT SESSIONN 1 
-            CURRENTLY CAN DO 1+1=2, + 2 = 4
-            NEED EVERYTHING TO RESET IF A NUMBER IS PRESSED AFTER '='
-            currently just adds numbers to display lol
+            when num2 and operator = 'ready4next', pressing '.'
+            and then a number, deletes the '0.'
 
-                Maybe need to let operator and num2 equal to something other 
-                than undefined so it's easy to detect when doing a second equation
-                 !! ready4Next !!
-
-            ALSO NEED A WAY TO ADD NUMBERS TO ZERO WHEN DECIMAL IS PRESSED
-            CURRENTLY OUTPUTS JUST '.4' INSTEAD OF '0.4'
-
-
-            ---------------------------------------------------------------------
-            NOTES FOR SESSION 2 
-            Can finally do subsequent equations (hooray!)
-
-            I broke something else lol
-            num1 + num 2 = 
-            then + num 2 
-            breaks the calculator (happens when i click num2, 
-            so must be a number button rule)...sets num2 same as num1???
-            if '=' is clicked, operator needs to be reset every time
-
-            NEED TO LIMIT INPUT TO ONLY ONW '.'
-            NEED TO LIMIT AMOUNT OF CHARACTERS TO 10
-                Round bigger answers?
-                disable buttons!
+            also, 0.5 * 3 returns crazy results???
+                I think this can be fixed with rounding
 
             } */
             
             console.log(`num 1 value: ${num1}`);
             console.log(`num 2 value: ${num2}`);
             console.log(`Current operator: ${operator}`);
+            console.log(`Contains decimal? ${containsChar}`);
             
             
         });
