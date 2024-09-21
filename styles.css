@@ -56,6 +56,7 @@ button {
     height: 100%;
     width: 100%;
     border-radius: 5%;
+    transition: background-color 0.3s ease;
 }
 
 button.wide-number {
@@ -67,10 +68,37 @@ button.wide-number {
     background-color: #6AA956;
 }
 
+button.number:hover,
+button.wide-number:hover {
+    background-color: #88c176; /* Lighter shade on hover */
+}
+
+button.number:active,
+button.wide-number:active {
+    background-color: #a6d896; /* Even lighter on click */
+}
+
+
 button.special {
     background-color: #A9566A;
 }
 
+button.special:hover {
+    background-color: #c17688; /* Lighter on hover */
+}
+
+button.special:active {
+    background-color: #d896a6; /* Lighter on click */
+}
+
 button.operator {
     background-color: #566AA9;
+}
+
+button.operator:hover {
+    background-color: #7688c1; /* Lighter on hover */
+}
+
+button.operator:active {
+    background-color: #96a6d8; /* Lighter on click */
 }

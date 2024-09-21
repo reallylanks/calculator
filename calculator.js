@@ -22,15 +22,22 @@ const clearMemory = function() {
     num1 = undefined;
     num2 = undefined;
     operator = undefined;
+    charLimit = undefined;
 };
 
+let maxChars = 10
 let displayValue1 = '0';
 let num1;
 let num2;
-let operator; 
+let operator;
+let charLimit;
+let integerPart;
+
+
 
 const operate = function(num1, num2, operator) {
     let result;
+
     if (operator === '+') {
         result = add(num1, num2);
     } else if (operator === '-') {
@@ -42,12 +49,39 @@ const operate = function(num1, num2, operator) {
     }
 
     return result.toString();
-
 };
+
+const characterLimit = function() {
+
+    let resultString = displayValue1;
+
+    if (resultString.length > maxChars) {
+        let parts = resultString.split('.');
+        integerPart = parts[0];
+        let decimalPart = parts[1] || '';
+
+        if (integerPart.length > maxChars) {
+            return "Too big!";
+        }
+       
+        let decimalPlacesAllowed = maxChars - integerPart.length - 1;
+
+        if (decimalPlacesAllowed > 0) {
+            result = parseFloat(parseFloat(resultString).toFixed(decimalPlacesAllowed));
+        } 
+
+        else {
+            result = parseFloat(integerPart);
+        }
+
+        resultString = result.toString();
+    }
+
+    return resultString;
+}
 
 document.addEventListener('DOMContentLoaded', function() {
     const buttonContainer = document.getElementById('buttonContainer');
-    const display = document.getElementById('display');
 
     const buttons = [
         {text: 'AC', class: 'special'},
@@ -75,14 +109,19 @@ document.addEventListener('DOMContentLoaded', function() {
         const button = document.createElement('button');
         button.innerText = buttonInfo.text;
         button.classList.add(buttonInfo.class);
-        button.addEventListener('click', () => {
+        button.addEventListener('click', () => {  
     
-            // NOTE. anything (operator) number then decimal, erases number
-        
             if (buttonInfo.class === 'number' || buttonInfo.class === 'wide-number') {
                 
+                if (charLimit !== undefined) {
+                    charLimit = undefined;
+                }
+
+                else if (displayValue1.length >= 10 && charLimit === undefined) {
+                    return;
+                } 
+
                 if (buttonInfo.text === '.' && displayValue1.includes('.') && (num1 === undefined || num1 === 'ready4Next' )) {
-                
                     console.log('DO NOTHING')
                     return;
                 } 
@@ -91,53 +130,31 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (displayValue1 === '0.') {
                         displayValue1 += buttonInfo.text;
                         updateDisplay();
-                        console.log("Option 1 was run");
                     }
                    
                     else if (buttonInfo.text === '.'){
                         displayValue1 = '0.';
                         clearMemory();
                         updateDisplay();
-                        console.log("Option 2 was run");
                     }
 
                     else {
                         displayValue1 = buttonInfo.text
                         clearMemory();
                         updateDisplay();
-                        console.log("Option 3 was run");
-                    }
-                    
-                }
-
-                else if (buttonInfo.text === '.' && operator !== undefined) {
-
-                    console.log(`Display Value : ${displayValue1}`)
-
-                     displayValue1 = '0.';
-                     console.log('did it work..?')
-                     updateDisplay();       
-
-                    /*if (displayValue1 === num1) {
-                        displayValue1 = '0.';
-                        updateDisplay();
-                    }
-
-                    else {
-                        displayValue1 += buttonInfo.text;
-                        console.log('problem!')
-                        updateDisplay();
-                    } */
-
-                    
-                    
-                    // this is the root of my decimal problem...to tired to even put it into words...
-                    
+                    } 
                 }
 
                 // if num1 is equal to display and operator is NOT undefined, display now equals button text value 
                 else if (num1 == displayValue1 && operator !== undefined) {
-                    displayValue1 = buttonInfo.text;
+                    if (buttonInfo.text === '.') {
+                        displayValue1 = '0.';
+                    }
+
+                    else {
+                        displayValue1 = buttonInfo.text;
+                    }
+                    
                     updateDisplay();
                 } 
 
@@ -152,38 +169,26 @@ document.addEventListener('DOMContentLoaded', function() {
                     updateDisplay();
                 }
 
+                else if (num1 == displayValue1 && operator !== undefined) {
+                    displayValue1 = buttonInfo.text;
+                    updateDisplay();
+                } 
+
                 // if calc is fresh or if num2 is 'ready4next', add pressed number to display
                 else if ((num1 === undefined && num2 === undefined && operator === undefined) || (num1 !== undefined && (num2 === 'ready4Next' || num2 === undefined))) {
                     displayValue1 += buttonInfo.text;
                     updateDisplay();
                 } 
-                // START OF A NEW EQUATION: if num2 and operator are 'ready4Next', button pressed resets calc and becomes display value
-                /* if (num2 === 'ready4Next' && operator === 'ready4Next') {
-                    if (displayValue1 === '0.') {
-                        displayValue1 += buttonInfo.text;
-                        updateDisplay();
-                    }
-                   
-                    if (buttonInfo.text === '.'){
-                        displayValue1 = '0.';
-                        updateDisplay();
-                    }
-
-                    else {
-                        displayValue1 = buttonInfo.text
-                        num1 = undefined;
-                        num2 = undefined;
-                        operator = undefined;
-                        updateDisplay();
-                    }
-                    
-                } */
-
-               
             }
             
             if (buttonInfo.class === 'operator') {
-                
+     
+                charLimit = 'reset!'
+
+                if (displayValue1 === 'Too big!' || displayValue1 === 'lmao') {
+                    return;
+                }
+
                 if (num1 === undefined) {
                     num1 = Number(displayValue1);
                 }
@@ -199,21 +204,41 @@ document.addEventListener('DOMContentLoaded', function() {
                 else if (buttonInfo.text !== '=' && operator !== undefined) {
                     num1 = Number(num1);
                     num2 = Number(displayValue1);
+
+                    if (num2 === 0 && operator === '/') {
+                        displayValue1 = 'lmao';
+                        num2 = 'ready4Next';
+                        operator = 'ready4Next';
+                        updateDisplay();
+                        return;
+                    } 
+                    
                     displayValue1 = operate(num1, num2, operator);
+                    displayValue1 = characterLimit();
                     num1 = Number(displayValue1);
                     num2 = 'ready4Next';
                     operator = buttonInfo.text;
-                    updateDisplay(); 
+                    updateDisplay();
                 }
 
                 else if (buttonInfo.text === '=' && num1 !== undefined) {
                     num1 = Number(num1);
                     num2 = Number(displayValue1);
+                    
+                    if (num2 === 0 && operator === '/') {
+                        displayValue1 = 'lmao';
+                        num2 = 'ready4Next';
+                        operator = 'ready4Next';
+                        updateDisplay();
+                        return;
+                    } 
+
                     displayValue1 = operate(num1, num2, operator);
+                    displayValue1 = characterLimit();
                     num1 = Number(displayValue1);
                     num2 = 'ready4Next';
                     operator = 'ready4Next';
-                    updateDisplay(); 
+                    updateDisplay();
                 }
             }
 
@@ -251,27 +276,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
             }
-
-
-            /*so
-            NOTES FOR NEXT SESSIONN 1 
-            when num2 and operator = 'ready4next', pressing '.'
-            and then a number, deletes the '0.'
-
-            also, 0.5 * 3 returns crazy results???
-                I think this can be fixed with rounding
-
-            } */
-            
+ 
             console.log(`num 1 value: ${num1}`);
             console.log(`num 2 value: ${num2}`);
             console.log(`Current operator: ${operator}`);
-            console.log(`Contains decimal? ${containsChar}`);
-            
-            
+            console.log(`charLimit value: ${charLimit}`);
         });
 
-        // add function for buttons to be lighter on hover, also add white on click
         buttonContainer.appendChild(button);
     })
 });
